@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarritoController;
+use App\Http\Controllers\CompraController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\TiendaController;
 use Illuminate\Http\Request;
@@ -38,5 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('carrito', [CarritoController::class, 'index']);
         Route::post('carrito', [CarritoController::class, 'store']);
         Route::delete('carrito/{itemId}', [CarritoController::class, 'destroy']);
+    });
+
+
+    Route::middleware('auth:cliente')->group(function () {
+        Route::post('compras/finalizar', [CompraController::class, 'store']);
     });
 });
