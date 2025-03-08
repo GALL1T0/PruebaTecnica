@@ -5,6 +5,7 @@ use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\CompraController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\TiendaController;
+use App\Http\Controllers\VentaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,5 +46,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('auth:cliente')->group(function () {
         Route::get('compras/historial', [CompraController::class, 'index']);
         Route::post('compras/finalizar', [CompraController::class, 'store']);
+    });
+
+    Route::middleware('auth:vendedor')->group(function () {
+        Route::get('tiendas/{tiendaId}/ventas', [VentaController::class, 'index']);
     });
 });
