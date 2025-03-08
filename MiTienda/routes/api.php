@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::middleware('auth:cliente')->group(function () {
+        Route::get('compras/historial', [CompraController::class, 'index']);
         Route::post('compras/finalizar', [CompraController::class, 'store']);
     });
 });

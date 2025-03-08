@@ -12,6 +12,38 @@ use Illuminate\Support\Facades\DB;
 
 class CompraController extends Controller
 {
+    // Obtener el historial de compras del cliente autenticado
+    public function index(Request $request)
+    {
+        $cliente = auth('cliente')->user();
+
+        $query = $cliente->compras()->with('items.producto');
+
+        // Filtrar por fecha
+        if ($request->has('fecha_inicio')) {
+            $query->where('created_at', '>=', $request->fecha_inicio);
+        }
+
+        if ($request->has('fecha_fin')) {
+            $query->where('created_at', '<=', $request->fecha_fin);
+        }
+
+        // Filtrar por total mínimo
+        if ($request->has('total_min')) {
+            $query->where('total', '>=', $request->total_min);
+        }
+
+        // Filtrar por total máximo
+        if ($request->has('total_max')) {
+            $query->where('total', '<=', $request->total_max);
+        }
+
+        // Paginar los resultados
+        $compras = $query->paginate(10);
+
+        return response()->json($compras);
+    }
+
     // Finalizar la compra
     public function store(Request $request)
     {
