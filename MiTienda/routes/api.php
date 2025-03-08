@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\TiendaController;
 use Illuminate\Http\Request;
@@ -17,21 +18,25 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-
+// Rutas públicas (sin autenticación)
 Route::post('register/cliente', [AuthController::class, 'registerCliente']);
 Route::post('register/vendedor', [AuthController::class, 'registerVendedor']);
 Route::post('login', [AuthController::class, 'login']);
-Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
+// Rutas protegidas (requieren autenticación)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout']);
 
-Route::middleware('auth:vendedor')->group(function () {
-    // Rutas para tiendas
-    Route::apiResource('tiendas', TiendaController::class);
+    // Rutas para vendedores
+    Route::middleware('auth:vendedor')->group(function () {
+        Route::apiResource('tiendas', TiendaController::class);
+        Route::apiResource('tiendas.productos', ProductoController::class)->except(['show']);
+    });
 
-    // Rutas para productos
-    Route::apiResource('tiendas.productos', ProductoController::class)->except(['show']);
+    // Rutas para clientes
+    Route::middleware('auth:cliente')->group(function () {
+        Route::get('carrito', [CarritoController::class, 'index']);
+        Route::post('carrito', [CarritoController::class, 'store']);
+        Route::delete('carrito/{itemId}', [CarritoController::class, 'destroy']);
+    });
 });
